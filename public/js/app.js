@@ -1,5 +1,3 @@
-// Shared utility functions
-
 function getToken() {
   return localStorage.getItem("token");
 }
@@ -22,7 +20,6 @@ function authFetch(url, options = {}) {
   return fetch(url, options);
 }
 
-// Update navbar based on login state
 document.addEventListener("DOMContentLoaded", () => {
   const user = getUser();
   const loginLink = document.getElementById("loginLink");
@@ -30,12 +27,14 @@ document.addEventListener("DOMContentLoaded", () => {
   const logoutBtn = document.getElementById("logoutBtn");
   const adminLink = document.getElementById("adminLink");
   const myAppsLink = document.getElementById("myAppsLink");
+  const employerLink = document.getElementById("employerLink");
 
   if (user) {
     if (loginLink) loginLink.style.display = "none";
     if (registerLink) registerLink.style.display = "none";
     if (logoutBtn) logoutBtn.style.display = "inline-block";
-    if (myAppsLink) myAppsLink.style.display = "inline-block";
+    if (myAppsLink && user.role === "user") myAppsLink.style.display = "inline-block";
     if (adminLink && user.role === "admin") adminLink.style.display = "inline-block";
+    if (employerLink && user.role === "employer") employerLink.style.display = "inline-block";
   }
 });

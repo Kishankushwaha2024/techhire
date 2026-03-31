@@ -28,6 +28,17 @@
         <label>Password</label>
         <input type="password" id="password" placeholder="Min 6 characters"/>
       </div>
+      <div class="form-group">
+        <label>I am a</label>
+        <div style="display:flex;gap:1rem;margin-top:.4rem">
+          <label style="display:flex;align-items:center;gap:.4rem;cursor:pointer;font-size:.95rem">
+            <input type="radio" name="role" value="user" checked/> Job Seeker
+          </label>
+          <label style="display:flex;align-items:center;gap:.4rem;cursor:pointer;font-size:.95rem">
+            <input type="radio" name="role" value="employer"/> Employer / Recruiter
+          </label>
+        </div>
+      </div>
       <button onclick="register()" class="btn-primary full-width">Create Account</button>
       <div id="msg" class="msg"></div>
       <p class="auth-link">Already have an account? <a href="/pages/login.html">Login here</a></p>
@@ -39,13 +50,14 @@
       const name = document.getElementById("name").value;
       const email = document.getElementById("email").value;
       const password = document.getElementById("password").value;
+      const role = document.querySelector('input[name="role"]:checked').value;
       const msg = document.getElementById("msg");
       if (!name || !email || !password) { msg.textContent = "All fields required"; msg.className = "msg error"; return; }
       try {
         const res = await fetch("/api/auth/register", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ name, email, password }),
+          body: JSON.stringify({ name, email, password, role }),
         });
         const data = await res.json();
         if (!res.ok) { msg.textContent = data.error; msg.className = "msg error"; return; }
@@ -53,7 +65,10 @@
         localStorage.setItem("user", JSON.stringify(data.user));
         msg.textContent = "Account created! Redirecting...";
         msg.className = "msg success";
-        setTimeout(() => window.location.href = "/", 1000);
+        setTimeout(() => {
+          if (data.user.role === "employer") window.location.href = "/pages/employer.html";
+          else window.location.href = "/";
+        }, 1000);
       } catch {
         msg.textContent = "Server error. Try again.";
         msg.className = "msg error";

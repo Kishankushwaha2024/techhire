@@ -8,6 +8,7 @@ const authRoutes = require("./routes/auth");
 const jobRoutes = require("./routes/jobs");
 const adminRoutes = require("./routes/admin");
 const applyRoutes = require("./routes/apply");
+const employerRoutes = require("./routes/employer");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -22,6 +23,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/jobs", jobRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/apply", applyRoutes);
+app.use("/api/employer", employerRoutes);
 
 app.get("*", (req, res) => {
   res.sendFile(path.join(__dirname, "public", "index.html"));

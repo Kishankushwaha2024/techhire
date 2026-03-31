@@ -48,7 +48,9 @@
         msg.textContent = "Login successful! Redirecting...";
         msg.className = "msg success";
         setTimeout(() => {
-          window.location.href = data.user.role === "admin" ? "/pages/admin.html" : "/";
+          if (data.user.role === "admin") window.location.href = "/pages/admin.html";
+          else if (data.user.role === "employer") window.location.href = "/pages/employer.html";
+          else window.location.href = "/";
         }, 1000);
       } catch {
         msg.textContent = "Server error. Try again.";

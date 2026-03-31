@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Employer Dashboard — TechHire</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="/css/style.css"/>
+</head>
+<body>
+  <nav class="navbar">
+    <a href="/" class="nav-brand">Tech<span>Hire</span></a>
+    <div class="nav-links">
+      <a href="/">Home</a>
+      <span id="employerName" style="color:#f59e0b;font-weight:600;font-size:.9rem"></span>
+      <button onclick="logout()" class="btn-logout">Logout</button>
+    </div>
+  </nav>
+
+  <div class="admin-container container">
+    <h2 class="admin-title">Employer Dashboard</h2>
+
+    <div class="admin-tabs">
+      <button class="tab-btn active" onclick="showTab('post')">Post Job</button>
+      <button class="tab-btn" onclick="showTab('myjobs')">My Jobs</button>
+      <button class="tab-btn" onclick="showTab('applications')">Applications</button>
+    </div>
+
+    <!-- POST JOB TAB -->
+    <div id="tab-post" class="tab-content">
+      <div class="admin-card">
+        <h3>Post a New Job</h3>
+        <div class="grid-2">
+          <div class="form-group"><label>Job Title *</label><input type="text" id="jobTitle" placeholder="e.g. Software Engineer"/></div>
+          <div class="form-group"><label>Company Name *</label><input type="text" id="jobCompany" placeholder="e.g. TechCorp"/></div>
+          <div class="form-group"><label>Location</label><input type="text" id="jobLocation" placeholder="e.g. Mumbai / Remote"/></div>
+          <div class="form-group"><label>Salary</label><input type="text" id="jobSalary" placeholder="e.g. ₹5-8 LPA"/></div>
+          <div class="form-group">
+            <label>Job Type</label>
+            <select id="jobType">
+              <option value="Full-Time">Full-Time</option>
+              <option value="Part-Time">Part-Time</option>
+              <option value="Remote">Remote</option>
+              <option value="Internship">Internship</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group"><label>Job Description</label><textarea id="jobDesc" rows="3" placeholder="Describe the role and responsibilities..."></textarea></div>
+        <div class="form-group"><label>Requirements</label><textarea id="jobReq" rows="3" placeholder="Skills, qualifications needed..."></textarea></div>
+        <button onclick="postJob()" class="btn-primary">Post Job</button>
+        <div id="jobMsg" class="msg"></div>
+      </div>
+    </div>
+
+    <!-- MY JOBS TAB -->
+    <div id="tab-myjobs" class="tab-content" style="display:none">
+      <h3 style="margin-bottom:1rem">My Posted Jobs</h3>
+      <div id="myJobsList"></div>
+    </div>
+
+    <!-- APPLICATIONS TAB -->
+    <div id="tab-applications" class="tab-content" style="display:none">
+      <h3 style="margin-bottom:1rem">Applications Received</h3>
+      <div id="myApplicationsList"></div>
+    </div>
+  </div>
+
+  <script src="/js/app.js"></script>
+  <script>
+    const user = getUser();
+    if (!user || user.role !== 'employer') {
+      alert("Employer access only!");
+      window.location.href = "/";
+    }
+    document.getElementById("employerName").textContent = user.name;
+
+    function showTab(tab) {
+      document.querySelectorAll(".tab-content").forEach(t => t.style.display = "none");
+      document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+      document.getElementById(`tab-${tab}`).style.display = "block";
+      event.target.classList.add("active");
+      if (tab === "myjobs") loadMyJobs();
+      if (tab === "applications") loadMyApplications();
+    }
+
+    async function postJob() {
+      const title = document.getElementById("jobTitle").value;
+      const company = document.getElementById("jobCompany").value;
+      const location = document.getElementById("jobLocation").value;
+      const salary = document.getElementById("jobSalary").value;
+      const type = document.getElementById("jobType").value;
+      const description = document.getElementById("jobDesc").value;
+      const requirements = document.getElementById("jobReq").value;
+      const msg = document.getElementById("jobMsg");
+
+      if (!title || !company) { msg.textContent = "Title aur Company required hai!"; msg.className = "msg error"; return; }
+
+      try {
+        const res = await authFetch("/api/employer/jobs", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ title, company, location, salary, type, description, requirements }),
+        });
+        const data = await res.json();
+        if (!res.ok) { msg.textContent = data.error; msg.className = "msg error"; return; }
+        msg.textContent = "✅ Job posted successfully!";
+        msg.className = "msg success";
+        document.getElementById("jobTitle").value = "";
+        document.getElementById("jobCompany").value = "";
+        document.getElementById("jobLocation").value = "";
+        document.getElementById("jobSalary").value = "";
+        document.getElementById("jobDesc").value = "";
+        document.getElementById("jobReq").value = "";
+      } catch {
+        msg.textContent = "Server error. Try again.";
+        msg.className = "msg error";
+      }
+    }
+
+    async function loadMyJobs() {
+      const container = document.getElementById("myJobsList");
+      try {
+        const res = await authFetch("/api/employer/jobs");
+        const jobs = await res.json();
+        if (!jobs.length) { container.innerHTML = "<p>Abhi koi job post nahi ki. Post Job tab se karo!</p>"; return; }
+        container.innerHTML = `
+          <table class="admin-table">
+            <thead><tr><th>Title</th><th>Company</th><th>Type</th><th>Location</th><th>Posted</th><th>Action</th></tr></thead>
+            <tbody>
+              ${jobs.map(j => `
+                <tr>
+                  <td><strong>${esc(j.title)}</strong></td>
+                  <td>${esc(j.company)}</td>
+                  <td>${j.type || "-"}</td>
+                  <td>${j.location || "-"}</td>
+                  <td>${new Date(j.created_at).toLocaleDateString("en-IN")}</td>
+                  <td><button class="btn-danger" onclick="deleteJob(${j.id})">Delete</button></td>
+                </tr>
+              `).join("")}
+            </tbody>
+          </table>`;
+      } catch { container.innerHTML = "<p>Error loading jobs.</p>"; }
+    }
+
+    async function deleteJob(id) {
+      if (!confirm("Is job ko delete karna chahte ho?")) return;
+      await authFetch(`/api/employer/jobs/${id}`, { method: "DELETE" });
+      loadMyJobs();
+    }
+
+    async function loadMyApplications() {
+      const container = document.getElementById("myApplicationsList");
+      try {
+        const res = await authFetch("/api/employer/applications");
+        const apps = await res.json();
+        if (!apps.length) { container.innerHTML = "<p>Koi application nahi mili abhi tak.</p>"; return; }
+        container.innerHTML = `
+          <table class="admin-table">
+            <thead><tr><th>Applicant</th><th>Email</th><th>Job</th><th>Resume</th><th>Applied</th><th>Status</th></tr></thead>
+            <tbody>
+              ${apps.map(a => `
+                <tr>
+                  <td>${esc(a.user_name)}</td>
+                  <td>${esc(a.user_email)}</td>
+                  <td>${esc(a.job_title)}</td>
+                  <td>${a.resume_path ? `<a href="/uploads/${a.resume_path}" target="_blank" style="color:#f59e0b">View CV</a>` : "-"}</td>
+                  <td>${new Date(a.applied_at).toLocaleDateString("en-IN")}</td>
+                  <td>
+                    <select onchange="updateStatus(${a.id}, this.value)" style="border:1px solid #e2e8f0;border-radius:6px;padding:.2rem .4rem;font-size:.8rem;">
+                      <option ${a.status==="pending"?"selected":""} value="pending">Pending</option>
+                      <option ${a.status==="accepted"?"selected":""} value="accepted">Accept ✅</option>
+                      <option ${a.status==="rejected"?"selected":""} value="rejected">Reject ❌</option>
+                    </select>
+                  </td>
+                </tr>
+              `).join("")}
+            </tbody>
+          </table>`;
+      } catch { container.innerHTML = "<p>Error loading applications.</p>"; }
+    }
+
+    async function updateStatus(id, status) {
+      await authFetch(`/api/employer/applications/${id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status }),
+      });
+    }
+
+    function esc(str) {
+      if (!str) return "";
+      return String(str).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+    }
+  </script>
+</body>
+</html>

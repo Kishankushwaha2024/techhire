@@ -25,6 +25,7 @@ async function initDB() {
       type VARCHAR(50),
       description TEXT,
       requirements TEXT,
+      employer_id INTEGER REFERENCES users(id) ON DELETE SET NULL,
       created_at TIMESTAMP DEFAULT NOW()
     );
 
