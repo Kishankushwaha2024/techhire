@@ -29,19 +29,6 @@ async function initDB() {
       created_at TIMESTAMP DEFAULT NOW()
     );
 
-    CREATE TABLE IF NOT EXISTS profiles (
-      id SERIAL PRIMARY KEY,
-      user_id INTEGER UNIQUE REFERENCES users(id) ON DELETE CASCADE,
-      bio TEXT,
-      phone VARCHAR(20),
-      location VARCHAR(100),
-      education TEXT,
-      skills TEXT,
-      experience TEXT,
-      pic_url VARCHAR(255),
-      updated_at TIMESTAMP DEFAULT NOW()
-    );
-
     CREATE TABLE IF NOT EXISTS applications (
       id SERIAL PRIMARY KEY,
       job_id INTEGER REFERENCES jobs(id) ON DELETE CASCADE,
