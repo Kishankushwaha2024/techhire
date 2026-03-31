@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>My Applications — JobHive</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="/css/style.css"/>
+</head>
+<body>
+  <nav class="navbar">
+    <a href="/" class="nav-brand">Job<span>Hive</span></a>
+    <div class="nav-links">
+      <a href="/">Jobs</a>
+      <button onclick="logout()" class="btn-logout">Logout</button>
+    </div>
+  </nav>
+  <div class="container" style="padding-top:2rem">
+    <h2>My Applications</h2>
+    <div id="appsList" style="margin-top:1.5rem"></div>
+  </div>
+  <script src="/js/app.js"></script>
+  <script>
+    const user = getUser();
+    if (!user) window.location.href = "/pages/login.html";
+
+    async function loadMyApps() {
+      const res = await authFetch("/api/apply/my/all");
+      const data = await res.json();
+      const container = document.getElementById("appsList");
+      if (!data.length) { container.innerHTML = '<p class="no-jobs">No applications yet. <a href="/">Browse jobs</a></p>'; return; }
+      container.innerHTML = data.map(a => `
+        <div class="job-card" style="margin-bottom:1rem">
+          <div class="job-header">
+            <div>
+              <div class="job-title">${a.job_title}</div>
+              <div class="job-company">${a.company}</div>
+            </div>
+            <span class="badge badge-${a.status}">${a.status.toUpperCase()}</span>
+          </div>
+          <div class="job-meta">Applied: ${new Date(a.applied_at).toLocaleDateString("en-IN")}</div>
+          ${a.cover_letter ? `<div style="margin-top:.5rem;font-size:.85rem;color:#666">"${a.cover_letter.substring(0,100)}..."</div>` : ""}
+        </div>
+      `).join("");
+    }
+    loadMyApps();
+  </script>
+</body>
+</html>
