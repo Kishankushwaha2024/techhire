@@ -373,3 +373,9 @@ body {
   .grid-2 { grid-template-columns: 1fr; }
   .admin-table { font-size: .75rem; }
 }
+
+
+/* Added responsive fixes */
+body{overflow-x:hidden;}
+.container{width:100%;max-width:1200px;margin:auto;padding:0 15px;}
+@media(max-width:768px){.navbar{flex-direction:column;} .search-box{width:100%;}}
