@@ -10,7 +10,8 @@ const adminRoutes = require("./routes/admin");
 const applyRoutes = require("./routes/apply");
 const employerRoutes = require("./routes/employer");
 
-const app = express();
+const profileRoutes = require("./routes/profile");
+
 const PORT = process.env.PORT || 3000;
 
 app.use(cors());
@@ -18,7 +19,9 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, "public")));
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+app.use("/uploads/profiles", express.static(path.join(__dirname, "uploads/profiles")));
 
+app.use("/api/profile", profileRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/jobs", jobRoutes);
 app.use("/api/admin", adminRoutes);

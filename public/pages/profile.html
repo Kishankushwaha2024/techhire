@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Profile — TechHire</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="/css/style.css"/>
+  <style>
+    .profile-wrapper {
+      max-width: 860px;
+      margin: 2.5rem auto;
+      padding: 0 1rem;
+    }
+    .profile-card {
+      background: #fff;
+      border-radius: 20px;
+      box-shadow: 0 4px 30px rgba(0,0,0,0.08);
+      overflow: hidden;
+    }
+    .profile-cover {
+      height: 140px;
+      background: linear-gradient(135deg, #0f172a 0%, #1e293b 60%, #f59e0b33 100%);
+      position: relative;
+    }
+    .profile-avatar-wrap {
+      position: absolute;
+      bottom: -50px;
+      left: 2rem;
+    }
+    .profile-avatar {
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      border: 4px solid #fff;
+      object-fit: cover;
+      background: #1e293b;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2.2rem;
+      font-weight: 700;
+      color: #f59e0b;
+      font-family: 'Syne', sans-serif;
+      overflow: hidden;
+    }
+    .profile-avatar img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 50%;
+    }
+    .edit-pic-btn {
+      position: absolute;
+      bottom: 2px;
+      right: 2px;
+      background: #f59e0b;
+      border: 2px solid #fff;
+      border-radius: 50%;
+      width: 28px;
+      height: 28px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: .75rem;
+    }
+    .profile-body {
+      padding: 4rem 2rem 2rem;
+    }
+    .profile-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      flex-wrap: wrap;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+    .profile-name {
+      font-family: 'Syne', sans-serif;
+      font-size: 1.6rem;
+      font-weight: 800;
+      color: #0f172a;
+    }
+    .profile-role-badge {
+      display: inline-block;
+      background: #f59e0b22;
+      color: #d97706;
+      border: 1px solid #f59e0b55;
+      border-radius: 999px;
+      padding: .2rem .75rem;
+      font-size: .75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: .5px;
+      margin-top: .3rem;
+    }
+    .profile-email {
+      color: #64748b;
+      font-size: .9rem;
+      margin-top: .2rem;
+    }
+    .btn-edit {
+      background: #0f172a;
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      padding: .55rem 1.3rem;
+      font-size: .85rem;
+      cursor: pointer;
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 500;
+      transition: background .2s;
+    }
+    .btn-edit:hover { background: #1e293b; }
+    .btn-save {
+      background: #f59e0b;
+      color: #0f172a;
+      border: none;
+      border-radius: 10px;
+      padding: .55rem 1.3rem;
+      font-size: .85rem;
+      cursor: pointer;
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 700;
+      transition: background .2s;
+    }
+    .btn-save:hover { background: #d97706; }
+    .profile-sections {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.2rem;
+      margin-top: 1.5rem;
+    }
+    @media (max-width: 620px) { .profile-sections { grid-template-columns: 1fr; } }
+    .profile-section {
+      background: #f8fafc;
+      border-radius: 14px;
+      padding: 1.2rem;
+      border: 1px solid #e2e8f0;
+    }
+    .profile-section.full { grid-column: 1 / -1; }
+    .section-label {
+      font-size: .7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: #94a3b8;
+      margin-bottom: .6rem;
+    }
+    .section-value {
+      color: #1e293b;
+      font-size: .92rem;
+      line-height: 1.6;
+      white-space: pre-wrap;
+    }
+    .section-value.empty { color: #94a3b8; font-style: italic; }
+    .profile-input, .profile-textarea {
+      width: 100%;
+      background: #fff;
+      border: 1.5px solid #e2e8f0;
+      border-radius: 8px;
+      padding: .5rem .75rem;
+      font-size: .9rem;
+      font-family: 'DM Sans', sans-serif;
+      color: #1e293b;
+      resize: vertical;
+      box-sizing: border-box;
+      transition: border-color .2s;
+    }
+    .profile-input:focus, .profile-textarea:focus {
+      outline: none;
+      border-color: #f59e0b;
+    }
+    .save-row {
+      display: flex;
+      gap: 0.8rem;
+      margin-top: 1.5rem;
+      justify-content: flex-end;
+    }
+    .btn-cancel {
+      background: #e2e8f0;
+      color: #475569;
+      border: none;
+      border-radius: 10px;
+      padding: .55rem 1.3rem;
+      font-size: .85rem;
+      cursor: pointer;
+      font-family: 'DM Sans', sans-serif;
+    }
+    .msg-bar {
+      padding: .6rem 1rem;
+      border-radius: 8px;
+      font-size: .85rem;
+      margin-top: 1rem;
+      display: none;
+    }
+    .msg-bar.success { background: #dcfce7; color: #166534; display: block; }
+    .msg-bar.error { background: #fee2e2; color: #991b1b; display: block; }
+    #picInput { display: none; }
+    .member-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: .4rem;
+      background: #f0fdf4;
+      border: 1px solid #86efac;
+      color: #166534;
+      border-radius: 999px;
+      padding: .2rem .75rem;
+      font-size: .75rem;
+      font-weight: 600;
+      margin-top: .3rem;
+    }
+    .view-notice {
+      background: #fef3c7;
+      border: 1px solid #fde68a;
+      color: #92400e;
+      border-radius: 10px;
+      padding: .6rem 1rem;
+      font-size: .82rem;
+      margin-bottom: 1.5rem;
+    }
+  </style>
+</head>
+<body>
+  <nav class="navbar">
+    <a href="/" class="nav-brand">Tech<span>Hire</span></a>
+    <div class="nav-links">
+      <a href="/">Jobs</a>
+      <a href="/pages/my-applications.html" id="myAppsLink" style="display:none">My Applications</a>
+      <a href="/pages/employer.html" id="employerLink" style="display:none">My Dashboard</a>
+      <a href="/pages/admin.html" id="adminLink" style="display:none">Admin</a>
+      <a href="/pages/login.html" id="loginLink">Login</a>
+      <a href="/pages/register.html" id="registerLink">Register</a>
+      <button onclick="logout()" id="logoutBtn" style="display:none" class="btn-logout">Logout</button>
+    </div>
+  </nav>
+
+  <div class="profile-wrapper">
+    <div id="viewNotice" class="view-notice" style="display:none">
+      👁️ You are viewing <strong id="viewingName"></strong>'s profile.
+    </div>
+
+    <div class="profile-card">
+      <div class="profile-cover">
+        <div class="profile-avatar-wrap">
+          <div class="profile-avatar" id="avatarBox">
+            <span id="avatarInitial"></span>
+            <img id="avatarImg" src="" style="display:none" alt="Profile"/>
+          </div>
+          <div class="edit-pic-btn" id="editPicBtn" style="display:none" title="Change Photo" onclick="document.getElementById('picInput').click()">📷</div>
+          <input type="file" id="picInput" accept="image/*" onchange="uploadPic(this)"/>
+        </div>
+      </div>
+
+      <div class="profile-body">
+        <div class="profile-top">
+          <div>
+            <div class="profile-name" id="profileName">—</div>
+            <div class="profile-email" id="profileEmail">—</div>
+            <span class="profile-role-badge" id="profileRole">—</span>
+            <span class="member-badge" id="memberSince">📅 —</span>
+          </div>
+          <button class="btn-edit" id="editBtn" style="display:none" onclick="toggleEdit(true)">✏️ Edit Profile</button>
+        </div>
+
+        <!-- VIEW MODE -->
+        <div id="viewMode">
+          <div class="profile-sections">
+            <div class="profile-section">
+              <div class="section-label">📞 Phone</div>
+              <div class="section-value" id="vPhone"><span class="empty">Not added</span></div>
+            </div>
+            <div class="profile-section">
+              <div class="section-label">📍 Location</div>
+              <div class="section-value" id="vLocation"><span class="empty">Not added</span></div>
+            </div>
+            <div class="profile-section full">
+              <div class="section-label">👤 Bio</div>
+              <div class="section-value" id="vBio"><span class="empty">Not added</span></div>
+            </div>
+            <div class="profile-section full">
+              <div class="section-label">🎓 Education Qualification</div>
+              <div class="section-value" id="vEducation"><span class="empty">Not added</span></div>
+            </div>
+            <div class="profile-section full">
+              <div class="section-label">💼 Skills</div>
+              <div class="section-value" id="vSkills"><span class="empty">Not added</span></div>
+            </div>
+            <div class="profile-section full">
+              <div class="section-label">🏢 Experience</div>
+              <div class="section-value" id="vExperience"><span class="empty">Not added</span></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- EDIT MODE -->
+        <div id="editMode" style="display:none">
+          <div class="profile-sections">
+            <div class="profile-section">
+              <div class="section-label">📞 Phone</div>
+              <input class="profile-input" id="ePhone" placeholder="Your phone number"/>
+            </div>
+            <div class="profile-section">
+              <div class="section-label">📍 Location</div>
+              <input class="profile-input" id="eLocation" placeholder="City, State"/>
+            </div>
+            <div class="profile-section full">
+              <div class="section-label">👤 Bio</div>
+              <textarea class="profile-textarea" id="eBio" rows="3" placeholder="Write a short bio about yourself..."></textarea>
+            </div>
+            <div class="profile-section full">
+              <div class="section-label">🎓 Education Qualification</div>
+              <textarea class="profile-textarea" id="eEducation" rows="3" placeholder="e.g. BCA from DDU, 2022–2025&#10;Class 12 from XYZ School, 2022"></textarea>
+            </div>
+            <div class="profile-section full">
+              <div class="section-label">💼 Skills</div>
+              <textarea class="profile-textarea" id="eSkills" rows="2" placeholder="e.g. JavaScript, Node.js, PostgreSQL, React"></textarea>
+            </div>
+            <div class="profile-section full">
+              <div class="section-label">🏢 Experience</div>
+              <textarea class="profile-textarea" id="eExperience" rows="3" placeholder="e.g. Intern at TechCorp (June–Aug 2024)&#10;Worked on backend APIs using Node.js"></textarea>
+            </div>
+          </div>
+          <div class="save-row">
+            <button class="btn-cancel" onclick="toggleEdit(false)">Cancel</button>
+            <button class="btn-save" onclick="saveProfile()">💾 Save Changes</button>
+          </div>
+          <div class="msg-bar" id="saveMsg"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="footer">
+    <div class="footer-inner">
+      <div class="footer-brand">Tech<span>Hire</span></div>
+      <div class="footer-tagline">Your gateway to the best tech opportunities</div>
+      <hr class="footer-divider"/>
+      <div class="footer-dev-label">Developed by</div>
+      <div class="footer-developers">
+        <span class="footer-dev-chip">Kishan Kushwaha</span>
+        <span class="footer-dev-chip">Akhand Pratap Singh</span>
+        <span class="footer-dev-chip">Aditya Soni</span>
+        <span class="footer-dev-chip">Shivansh Mishra</span>
+      </div>
+      <div class="footer-copy">&copy; 2025 TechHire &mdash; All Rights Reserved</div>
+    </div>
+  </footer>
+
+  <script src="/js/app.js"></script>
+  <script>
+    const loggedUser = getUser();
+    const params = new URLSearchParams(window.location.search);
+    const viewId = params.get("id");
+    const isOwnProfile = !viewId || (loggedUser && String(loggedUser.id) === String(viewId));
+
+    async function loadProfile() {
+      try {
+        let data;
+        if (isOwnProfile && loggedUser) {
+          const res = await authFetch("/api/profile/me/data");
+          data = await res.json();
+        } else {
+          const uid = viewId;
+          const res = await fetch(`/api/profile/${uid}`);
+          data = await res.json();
+          // Show viewing notice
+          document.getElementById("viewNotice").style.display = "block";
+          document.getElementById("viewingName").textContent = data.name;
+        }
+
+        // Fill header info
+        document.getElementById("profileName").textContent = data.name || "—";
+        document.getElementById("profileEmail").textContent = data.email || "—";
+        document.getElementById("profileRole").textContent = (data.role || "user").toUpperCase();
+        document.getElementById("memberSince").textContent =
+          "📅 Joined " + new Date(data.created_at).toLocaleDateString("en-IN", { month: "long", year: "numeric" });
+
+        // Avatar
+        const initial = (data.name || "U")[0].toUpperCase();
+        document.getElementById("avatarInitial").textContent = initial;
+        if (data.pic_url) {
+          document.getElementById("avatarImg").src = data.pic_url;
+          document.getElementById("avatarImg").style.display = "block";
+          document.getElementById("avatarInitial").style.display = "none";
+        }
+
+        // Fill view fields
+        setField("vPhone", data.phone);
+        setField("vLocation", data.location);
+        setField("vBio", data.bio);
+        setField("vEducation", data.education);
+        setField("vSkills", data.skills);
+        setField("vExperience", data.experience);
+
+        // Fill edit fields
+        document.getElementById("ePhone").value = data.phone || "";
+        document.getElementById("eLocation").value = data.location || "";
+        document.getElementById("eBio").value = data.bio || "";
+        document.getElementById("eEducation").value = data.education || "";
+        document.getElementById("eSkills").value = data.skills || "";
+        document.getElementById("eExperience").value = data.experience || "";
+
+        // Show edit button & pic button only for own profile
+        if (isOwnProfile && loggedUser) {
+          document.getElementById("editBtn").style.display = "inline-block";
+          document.getElementById("editPicBtn").style.display = "flex";
+        }
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+    function setField(id, value) {
+      const el = document.getElementById(id);
+      if (value && value.trim()) {
+        el.textContent = value;
+        el.classList.remove("empty");
+      } else {
+        el.innerHTML = '<span class="empty">Not added</span>';
+      }
+    }
+
+    function toggleEdit(on) {
+      document.getElementById("viewMode").style.display = on ? "none" : "block";
+      document.getElementById("editMode").style.display = on ? "block" : "none";
+      document.getElementById("editBtn").style.display = on ? "none" : "inline-block";
+      document.getElementById("saveMsg").className = "msg-bar";
+    }
+
+    async function saveProfile() {
+      const body = {
+        phone: document.getElementById("ePhone").value,
+        location: document.getElementById("eLocation").value,
+        bio: document.getElementById("eBio").value,
+        education: document.getElementById("eEducation").value,
+        skills: document.getElementById("eSkills").value,
+        experience: document.getElementById("eExperience").value,
+      };
+      const msg = document.getElementById("saveMsg");
+      try {
+        const res = await authFetch("/api/profile/update", {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(body)
+        });
+        const data = await res.json();
+        if (!res.ok) { msg.textContent = data.error; msg.className = "msg-bar error"; return; }
+        msg.textContent = "Profile saved successfully!";
+        msg.className = "msg-bar success";
+        setTimeout(() => { toggleEdit(false); loadProfile(); }, 1000);
+      } catch {
+        msg.textContent = "Server error. Try again.";
+        msg.className = "msg-bar error";
+      }
+    }
+
+    async function uploadPic(input) {
+      if (!input.files[0]) return;
+      const form = new FormData();
+      form.append("pic", input.files[0]);
+      try {
+        const res = await authFetch("/api/profile/upload-pic", { method: "POST", body: form });
+        const data = await res.json();
+        if (data.pic_url) {
+          document.getElementById("avatarImg").src = data.pic_url + "?t=" + Date.now();
+          document.getElementById("avatarImg").style.display = "block";
+          document.getElementById("avatarInitial").style.display = "none";
+        }
+      } catch { alert("Image upload failed."); }
+    }
+
+    loadProfile();
+  </script>
+</body>
+</html>
